@@ -16,6 +16,9 @@ const Dashboard = () => {
   const cards = [
     { title: "Género", href: "/generos" },
     { title: "Media", href: "/medias" },
+    { title: "Tipo", href: "/tipos" },
+    { title: "Productora", href: "/productoras" },
+    { title: "Director", href: "/directores" },
   ];
 
   return (

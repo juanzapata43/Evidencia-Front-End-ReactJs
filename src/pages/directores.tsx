@@ -2,124 +2,118 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_ROUTES from "../app/services/api";
 import Layout from "@/app/layout";
-import { useRouter } from "next/router";  // Importar useRouter
+import { useRouter } from "next/router";  // Importa useRouter
 
-interface Genero {
+interface Director {
   _id: string;
   nombre: string;
-  descripcion: string;
   estado: boolean;
   fechaCreacion: string;
   fechaActualizacion: string;
 }
 
 /**
- * Componente para gestionar géneros.
+ * Componente para gestionar directores.
  *
- * Este componente permite a los usuarios ver, agregar, editar y eliminar géneros. Obtiene la lista de géneros de una API y los muestra en una lista. Los usuarios pueden agregar nuevos géneros, editar los existentes y eliminar géneros. El componente también incluye un formulario para agregar y editar géneros.
+ * Este componente permite a los usuarios ver, agregar, editar y eliminar directores. Obtiene la lista de directores de una API y los muestra en una lista. Los usuarios pueden agregar nuevos directores, editar los existentes y eliminar directores.
  *
  * @component
  * @example
  * return (
- *   <Generos />
+ *   <Directores />
  * )
  *
- * @returns {React.FC} El componente Generos.
+ * @returns {React.FC} El componente Directores.
  */
-const Generos: React.FC = () => {
-  const [generos, setGeneros] = useState<Genero[]>([]);
+const Directores: React.FC = () => {
+  const [directores, setDirectores] = useState<Director[]>([]);
   const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
   const [estado, setEstado] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const router = useRouter();  // Inicializar el enrutador
+  const router = useRouter();  // Inicializa el enrutador
 
   useEffect(() => {
-    fetchGeneros();
+    fetchDirectores();
   }, []);
 
-  const fetchGeneros = async () => {
+  const fetchDirectores = async () => {
     try {
-      const response = await axios.get(API_ROUTES.GENEROS);
-      const data = response.data as Genero[];
+      const response = await axios.get(API_ROUTES.DIRECTORES);
+      const data = response.data as Director[];
 
       if (data && data.length > 0) {
-        console.log("Generos obtenidos:", data);
-        setGeneros(data);
+        console.log("Directores obtenidos:", data);
+        setDirectores(data);
       } else {
-        console.error("La respuesta no contiene géneros.");
+        console.error("La respuesta no contiene directores.");
       }
     } catch (error) {
-      console.error("Error fetching generos:", error);
+      console.error("Error fetching directores:", error);
     }
   };
 
-  const addGenero = async (e: React.FormEvent) => {
+  const addDirector = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(API_ROUTES.GENEROS, {
+      const response = await axios.post(API_ROUTES.DIRECTORES, {
         nombre,
-        descripcion,
         estado,
       });
-      setGeneros([...generos, response.data as Genero]);
+      setDirectores([...directores, response.data as Director]);
       resetForm();
     } catch (error) {
-      console.error("Error adding genero:", error);
+      console.error("Error adding director:", error);
     }
   };
 
-  const deleteGenero = async (_id: string) => {
+  const deleteDirector = async (_id: string) => {
     if (_id === undefined || _id === null) {
       console.error("ID inválido para eliminar");
       return;
     }
 
     try {
-      await axios.delete(`${API_ROUTES.GENEROS}/${_id}`);
-      setGeneros(generos.filter((genero) => genero._id !== _id));
+      await axios.delete(`${API_ROUTES.DIRECTORES}/${_id}`);
+      setDirectores(directores.filter((director) => director._id !== _id));
     } catch (error) {
-      console.error("Error deleting genero:", error);
+      console.error("Error deleting director:", error);
     }
   };
 
-  const startEditGenero = (genero: Genero) => {
-    setEditId(genero._id);
-    setNombre(genero.nombre);
-    setDescripcion(genero.descripcion);
-    setEstado(genero.estado);
+  const startEditDirector = (director: Director) => {
+    setEditId(director._id);
+    setNombre(director.nombre);
+    setEstado(director.estado);
   };
 
-  const updateGenero = async (e: React.FormEvent) => {
+  const updateDirector = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editId === null) return;
     try {
-      const response = await axios.put(`${API_ROUTES.GENEROS}/${editId}`, {
+      const response = await axios.put(`${API_ROUTES.DIRECTORES}/${editId}`, {
         nombre,
-        descripcion,
         estado,
       });
-      setGeneros(
-        generos.map((genero) =>
-          genero._id === editId ? (response.data as Genero) : genero
+      setDirectores(
+        directores.map((director) =>
+          director._id === editId ? (response.data as Director) : director
         )
       );
       resetForm();
     } catch (error) {
-      console.error("Error updating genero:", error);
+      console.error("Error updating director:", error);
     }
   };
 
   const resetForm = () => {
     setEditId(null);
     setNombre("");
-    setDescripcion("");
     setEstado(false);
   };
 
   // Función para regresar al menú principal
   const goBackToMenu = () => {
-    router.push('/');  // Redirige al panel de inicio
+    router.push('/');  // Redirige al panel de inicio (dashboard)
   };
 
   return (
@@ -127,24 +121,15 @@ const Generos: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-6">
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
           <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-            Géneros
+            Directores
           </h1>
-          <form onSubmit={editId ? updateGenero : addGenero} className="mb-8">
+          <form onSubmit={editId ? updateDirector : addDirector} className="mb-8">
             <div className="mb-4">
               <input
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 placeholder="Nombre"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <div className="mb-4">
-              <input
-                type="text"
-                value={descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                placeholder="Descripción"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -163,11 +148,11 @@ const Generos: React.FC = () => {
               type="submit"
               className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-300"
             >
-              {editId ? "Actualizar" : "Agregar"} Género
+              {editId ? "Actualizar" : "Agregar"} Director
             </button>
           </form>
 
-          {/* Botón para regresar al menú principal */}
+          {/* Agrega el botón para volver al menú principal */}
           <button
             onClick={goBackToMenu}
             className="w-full bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 transition duration-300 mb-4"
@@ -176,34 +161,33 @@ const Generos: React.FC = () => {
           </button>
 
           <ul className="space-y-4">
-            {generos.map((genero) => (
+            {directores.map((director) => (
               <li
-                key={genero._id}
+                key={director._id}
                 className="p-4 bg-gray-100 rounded-lg shadow-md"
               >
                 <p className="text-xl font-semibold text-gray-800">
-                  {genero.nombre}
+                  {director.nombre}
                 </p>
-                <p className="text-gray-600">{genero.descripcion}</p>
                 <p className="text-gray-600">
-                  Estado: {genero.estado ? "Activo" : "Inactivo"}
+                  Estado: {director.estado ? "Activo" : "Inactivo"}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Creado: {new Date(genero.fechaCreacion).toLocaleDateString()}
+                  Creado: {new Date(director.fechaCreacion).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-500">
                   Actualizado:{" "}
-                  {new Date(genero.fechaActualizacion).toLocaleDateString()}
+                  {new Date(director.fechaActualizacion).toLocaleDateString()}
                 </p>
                 <div className="flex space-x-2 mt-2">
                   <button
-                    onClick={() => startEditGenero(genero)}
+                    onClick={() => startEditDirector(director)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Editar
                   </button>
                   <button
-                    onClick={() => deleteGenero(genero._id)}
+                    onClick={() => deleteDirector(director._id)}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                   >
                     Eliminar
@@ -218,4 +202,4 @@ const Generos: React.FC = () => {
   );
 };
 
-export default Generos;
+export default Directores;

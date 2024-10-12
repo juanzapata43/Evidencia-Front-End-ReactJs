@@ -2,124 +2,112 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import API_ROUTES from "../app/services/api";
 import Layout from "@/app/layout";
-import { useRouter } from "next/router";  // Importar useRouter
+import { useRouter } from "next/router"; // Importar useRouter
 
-interface Genero {
+interface Productora {
   _id: string;
   nombre: string;
+  slogan: string;
   descripcion: string;
-  estado: boolean;
   fechaCreacion: string;
   fechaActualizacion: string;
 }
 
-/**
- * Componente para gestionar géneros.
- *
- * Este componente permite a los usuarios ver, agregar, editar y eliminar géneros. Obtiene la lista de géneros de una API y los muestra en una lista. Los usuarios pueden agregar nuevos géneros, editar los existentes y eliminar géneros. El componente también incluye un formulario para agregar y editar géneros.
- *
- * @component
- * @example
- * return (
- *   <Generos />
- * )
- *
- * @returns {React.FC} El componente Generos.
- */
-const Generos: React.FC = () => {
-  const [generos, setGeneros] = useState<Genero[]>([]);
+const Productoras: React.FC = () => {
+  const [productoras, setProductoras] = useState<Productora[]>([]);
   const [nombre, setNombre] = useState("");
+  const [slogan, setSlogan] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [estado, setEstado] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
-  const router = useRouter();  // Inicializar el enrutador
+
+  const router = useRouter(); // Inicializar el enrutador para la redirección
 
   useEffect(() => {
-    fetchGeneros();
+    fetchProductoras();
   }, []);
 
-  const fetchGeneros = async () => {
+  const fetchProductoras = async () => {
     try {
-      const response = await axios.get(API_ROUTES.GENEROS);
-      const data = response.data as Genero[];
+      const response = await axios.get(API_ROUTES.PRODUCTORAS);
+      const data = response.data as Productora[];
 
       if (data && data.length > 0) {
-        console.log("Generos obtenidos:", data);
-        setGeneros(data);
+        console.log("Productoras obtenidas:", data);
+        setProductoras(data);
       } else {
-        console.error("La respuesta no contiene géneros.");
+        console.error("La respuesta no contiene productoras.");
       }
     } catch (error) {
-      console.error("Error fetching generos:", error);
+      console.error("Error fetching productoras:", error);
     }
   };
 
-  const addGenero = async (e: React.FormEvent) => {
+  const addProductora = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(API_ROUTES.GENEROS, {
+      const response = await axios.post(API_ROUTES.PRODUCTORAS, {
         nombre,
+        slogan,
         descripcion,
-        estado,
       });
-      setGeneros([...generos, response.data as Genero]);
+      setProductoras([...productoras, response.data as Productora]);
       resetForm();
     } catch (error) {
-      console.error("Error adding genero:", error);
+      console.error("Error adding productora:", error);
     }
   };
 
-  const deleteGenero = async (_id: string) => {
+  const deleteProductora = async (_id: string) => {
     if (_id === undefined || _id === null) {
       console.error("ID inválido para eliminar");
       return;
     }
 
     try {
-      await axios.delete(`${API_ROUTES.GENEROS}/${_id}`);
-      setGeneros(generos.filter((genero) => genero._id !== _id));
+      await axios.delete(`${API_ROUTES.PRODUCTORAS}/${_id}`);
+      setProductoras(productoras.filter((productora) => productora._id !== _id));
     } catch (error) {
-      console.error("Error deleting genero:", error);
+      console.error("Error deleting productora:", error);
     }
   };
 
-  const startEditGenero = (genero: Genero) => {
-    setEditId(genero._id);
-    setNombre(genero.nombre);
-    setDescripcion(genero.descripcion);
-    setEstado(genero.estado);
+  const startEditProductora = (productora: Productora) => {
+    setEditId(productora._id);
+    setNombre(productora.nombre);
+    setSlogan(productora.slogan);
+    setDescripcion(productora.descripcion);
   };
 
-  const updateGenero = async (e: React.FormEvent) => {
+  const updateProductora = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editId === null) return;
     try {
-      const response = await axios.put(`${API_ROUTES.GENEROS}/${editId}`, {
+      const response = await axios.put(`${API_ROUTES.PRODUCTORAS}/${editId}`, {
         nombre,
+        slogan,
         descripcion,
-        estado,
       });
-      setGeneros(
-        generos.map((genero) =>
-          genero._id === editId ? (response.data as Genero) : genero
+      setProductoras(
+        productoras.map((productora) =>
+          productora._id === editId ? (response.data as Productora) : productora
         )
       );
       resetForm();
     } catch (error) {
-      console.error("Error updating genero:", error);
+      console.error("Error updating productora:", error);
     }
   };
 
   const resetForm = () => {
     setEditId(null);
     setNombre("");
+    setSlogan("");
     setDescripcion("");
-    setEstado(false);
   };
 
   // Función para regresar al menú principal
   const goBackToMenu = () => {
-    router.push('/');  // Redirige al panel de inicio
+    router.push('/'); // Redirige al panel de inicio
   };
 
   return (
@@ -127,9 +115,9 @@ const Generos: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-6">
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
           <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-            Géneros
+            Productoras
           </h1>
-          <form onSubmit={editId ? updateGenero : addGenero} className="mb-8">
+          <form onSubmit={editId ? updateProductora : addProductora} className="mb-8">
             <div className="mb-4">
               <input
                 type="text"
@@ -142,28 +130,26 @@ const Generos: React.FC = () => {
             <div className="mb-4">
               <input
                 type="text"
+                value={slogan}
+                onChange={(e) => setSlogan(e.target.value)}
+                placeholder="Slogan"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                type="text"
                 value={descripcion}
                 onChange={(e) => setDescripcion(e.target.value)}
                 placeholder="Descripción"
                 className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            <div className="mb-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={estado}
-                  onChange={(e) => setEstado(e.target.checked)}
-                  className="mr-2"
-                />
-                Estado
-              </label>
-            </div>
             <button
               type="submit"
               className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-300"
             >
-              {editId ? "Actualizar" : "Agregar"} Género
+              {editId ? "Actualizar" : "Agregar"} Productora
             </button>
           </form>
 
@@ -176,34 +162,32 @@ const Generos: React.FC = () => {
           </button>
 
           <ul className="space-y-4">
-            {generos.map((genero) => (
+            {productoras.map((productora) => (
               <li
-                key={genero._id}
+                key={productora._id}
                 className="p-4 bg-gray-100 rounded-lg shadow-md"
               >
                 <p className="text-xl font-semibold text-gray-800">
-                  {genero.nombre}
+                  {productora.nombre}
                 </p>
-                <p className="text-gray-600">{genero.descripcion}</p>
-                <p className="text-gray-600">
-                  Estado: {genero.estado ? "Activo" : "Inactivo"}
-                </p>
+                <p className="text-gray-600">{productora.slogan}</p>
+                <p className="text-gray-600">{productora.descripcion}</p>
                 <p className="text-sm text-gray-500">
-                  Creado: {new Date(genero.fechaCreacion).toLocaleDateString()}
+                  Creado: {new Date(productora.fechaCreacion).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-500">
                   Actualizado:{" "}
-                  {new Date(genero.fechaActualizacion).toLocaleDateString()}
+                  {new Date(productora.fechaActualizacion).toLocaleDateString()}
                 </p>
                 <div className="flex space-x-2 mt-2">
                   <button
-                    onClick={() => startEditGenero(genero)}
+                    onClick={() => startEditProductora(productora)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Editar
                   </button>
                   <button
-                    onClick={() => deleteGenero(genero._id)}
+                    onClick={() => deleteProductora(productora._id)}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                   >
                     Eliminar
@@ -218,4 +202,4 @@ const Generos: React.FC = () => {
   );
 };
 
-export default Generos;
+export default Productoras;

@@ -4,6 +4,7 @@ import API_ROUTES from "../app/services/api";
 import Layout from "@/app/layout";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from "next/router"; // Importar useRouter
 
 interface Media {
   _id: string;
@@ -18,7 +19,7 @@ interface Media {
   fechaCreacion: string;
   fechaActualizacion: string;
   urlPelicula: string;
-  ano_estreno: Date; // Cambiado a tipo Date para el DatePicker
+  ano_estreno: Date;
 }
 
 // Interfaces para dropdowns
@@ -40,6 +41,9 @@ const Medias: React.FC = () => {
   const [urlPelicula, setUrlPelicula] = useState("");
   const [anoEstreno, setAnoEstreno] = useState<Date | null>(new Date());
   const [editId, setEditId] = useState<string | null>(null);
+  
+  // Inicializar el enrutador
+  const router = useRouter(); 
 
   // Opciones para los dropdowns
   const [productoras, setProductoras] = useState<Option[]>([]);
@@ -172,6 +176,11 @@ const Medias: React.FC = () => {
     setAnoEstreno(new Date());
   };
 
+  // Función para regresar al menú principal
+  const goBackToMenu = () => {
+    router.push('/');  // Redirige al panel de inicio
+  };
+
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-6">
@@ -299,6 +308,14 @@ const Medias: React.FC = () => {
               {editId ? "Actualizar" : "Agregar"} Media
             </button>
           </form>
+
+          {/* Botón para regresar al menú principal */}
+          <button
+            onClick={goBackToMenu}
+            className="w-full bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 transition duration-300 mb-4"
+          >
+            Volver al Panel de Inicio
+          </button>
 
           {/* Listado de medias */}
           <ul className="space-y-4">

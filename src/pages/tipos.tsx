@@ -4,7 +4,7 @@ import API_ROUTES from "../app/services/api";
 import Layout from "@/app/layout";
 import { useRouter } from "next/router";  // Importar useRouter
 
-interface Genero {
+interface Tipo {
   _id: string;
   nombre: string;
   descripcion: string;
@@ -14,20 +14,20 @@ interface Genero {
 }
 
 /**
- * Componente para gestionar géneros.
+ * Componente para gestionar tipos.
  *
- * Este componente permite a los usuarios ver, agregar, editar y eliminar géneros. Obtiene la lista de géneros de una API y los muestra en una lista. Los usuarios pueden agregar nuevos géneros, editar los existentes y eliminar géneros. El componente también incluye un formulario para agregar y editar géneros.
+ * Este componente permite a los usuarios ver, agregar, editar y eliminar tipos. Obtiene la lista de tipos de una API y los muestra en una lista. Los usuarios pueden agregar nuevos tipos, editar los existentes y eliminar tipos.
  *
  * @component
  * @example
  * return (
- *   <Generos />
+ *   <Tipos />
  * )
  *
- * @returns {React.FC} El componente Generos.
+ * @returns {React.FC} El componente Tipos.
  */
-const Generos: React.FC = () => {
-  const [generos, setGeneros] = useState<Genero[]>([]);
+const Tipos: React.FC = () => {
+  const [tipos, setTipos] = useState<Tipo[]>([]);
   const [nombre, setNombre] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [estado, setEstado] = useState(false);
@@ -35,78 +35,78 @@ const Generos: React.FC = () => {
   const router = useRouter();  // Inicializar el enrutador
 
   useEffect(() => {
-    fetchGeneros();
+    fetchTipos();
   }, []);
 
-  const fetchGeneros = async () => {
+  const fetchTipos = async () => {
     try {
-      const response = await axios.get(API_ROUTES.GENEROS);
-      const data = response.data as Genero[];
+      const response = await axios.get(API_ROUTES.TIPOS);
+      const data = response.data as Tipo[];
 
       if (data && data.length > 0) {
-        console.log("Generos obtenidos:", data);
-        setGeneros(data);
+        console.log("Tipos obtenidos:", data);
+        setTipos(data);
       } else {
-        console.error("La respuesta no contiene géneros.");
+        console.error("La respuesta no contiene tipos.");
       }
     } catch (error) {
-      console.error("Error fetching generos:", error);
+      console.error("Error fetching tipos:", error);
     }
   };
 
-  const addGenero = async (e: React.FormEvent) => {
+  const addTipo = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post(API_ROUTES.GENEROS, {
+      const response = await axios.post(API_ROUTES.TIPOS, {
         nombre,
         descripcion,
         estado,
       });
-      setGeneros([...generos, response.data as Genero]);
+      setTipos([...tipos, response.data as Tipo]);
       resetForm();
     } catch (error) {
-      console.error("Error adding genero:", error);
+      console.error("Error adding tipo:", error);
     }
   };
 
-  const deleteGenero = async (_id: string) => {
+  const deleteTipo = async (_id: string) => {
     if (_id === undefined || _id === null) {
       console.error("ID inválido para eliminar");
       return;
     }
 
     try {
-      await axios.delete(`${API_ROUTES.GENEROS}/${_id}`);
-      setGeneros(generos.filter((genero) => genero._id !== _id));
+      await axios.delete(`${API_ROUTES.TIPOS}/${_id}`);
+      setTipos(tipos.filter((tipo) => tipo._id !== _id));
     } catch (error) {
-      console.error("Error deleting genero:", error);
+      console.error("Error deleting tipo:", error);
     }
   };
 
-  const startEditGenero = (genero: Genero) => {
-    setEditId(genero._id);
-    setNombre(genero.nombre);
-    setDescripcion(genero.descripcion);
-    setEstado(genero.estado);
+  const startEditTipo = (tipo: Tipo) => {
+    setEditId(tipo._id);
+    setNombre(tipo.nombre);
+    setDescripcion(tipo.descripcion);
+    setEstado(tipo.estado);
   };
 
-  const updateGenero = async (e: React.FormEvent) => {
+  const updateTipo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editId === null) return;
     try {
-      const response = await axios.put(`${API_ROUTES.GENEROS}/${editId}`, {
+      const response = await axios.put(`${API_ROUTES.TIPOS}/${editId}`, {
         nombre,
         descripcion,
         estado,
       });
-      setGeneros(
-        generos.map((genero) =>
-          genero._id === editId ? (response.data as Genero) : genero
+      setTipos(
+        tipos.map((tipo) =>
+          tipo._id === editId ? (response.data as Tipo) : tipo
         )
       );
       resetForm();
     } catch (error) {
-      console.error("Error updating genero:", error);
+      console.error("Error updating tipo:", error);
     }
   };
 
@@ -127,9 +127,9 @@ const Generos: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 p-6">
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
           <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">
-            Géneros
+            Tipos
           </h1>
-          <form onSubmit={editId ? updateGenero : addGenero} className="mb-8">
+          <form onSubmit={editId ? updateTipo : addTipo} className="mb-8">
             <div className="mb-4">
               <input
                 type="text"
@@ -163,7 +163,7 @@ const Generos: React.FC = () => {
               type="submit"
               className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-300"
             >
-              {editId ? "Actualizar" : "Agregar"} Género
+              {editId ? "Actualizar" : "Agregar"} Tipo
             </button>
           </form>
 
@@ -176,34 +176,34 @@ const Generos: React.FC = () => {
           </button>
 
           <ul className="space-y-4">
-            {generos.map((genero) => (
+            {tipos.map((tipo) => (
               <li
-                key={genero._id}
+                key={tipo._id}
                 className="p-4 bg-gray-100 rounded-lg shadow-md"
               >
                 <p className="text-xl font-semibold text-gray-800">
-                  {genero.nombre}
+                  {tipo.nombre}
                 </p>
-                <p className="text-gray-600">{genero.descripcion}</p>
+                <p className="text-gray-600">{tipo.descripcion}</p>
                 <p className="text-gray-600">
-                  Estado: {genero.estado ? "Activo" : "Inactivo"}
+                  Estado: {tipo.estado ? "Activo" : "Inactivo"}
                 </p>
                 <p className="text-sm text-gray-500">
-                  Creado: {new Date(genero.fechaCreacion).toLocaleDateString()}
+                  Creado: {new Date(tipo.fechaCreacion).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-500">
                   Actualizado:{" "}
-                  {new Date(genero.fechaActualizacion).toLocaleDateString()}
+                  {new Date(tipo.fechaActualizacion).toLocaleDateString()}
                 </p>
                 <div className="flex space-x-2 mt-2">
                   <button
-                    onClick={() => startEditGenero(genero)}
+                    onClick={() => startEditTipo(tipo)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Editar
                   </button>
                   <button
-                    onClick={() => deleteGenero(genero._id)}
+                    onClick={() => deleteTipo(tipo._id)}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                   >
                     Eliminar
@@ -218,4 +218,4 @@ const Generos: React.FC = () => {
   );
 };
 
-export default Generos;
+export default Tipos;

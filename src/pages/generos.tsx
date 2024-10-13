@@ -219,3 +219,4 @@ const Generos: React.FC = () => {
 };
 
 export default Generos;
+

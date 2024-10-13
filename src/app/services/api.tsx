@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:4000/api/v1";
+const API_BASE_URL = "https://evidencia-front-end-reactjs.onrender.com/api/v1";
 
 /**
  * Un objeto que contiene las rutas de la API para varios endpoints.
